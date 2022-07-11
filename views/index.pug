@@ -1,0 +1,59 @@
+extends layout
+
+block content
+  header
+    h1 Chat Chachi
+    h2 Usuarios conectados: <span id="num_usuarios"></span>
+  main 
+    ul#mensajes
+      each mensaje in mensajes
+        li #{mensaje.nombre}: #{mensaje.mensaje}
+  footer 
+    div 
+      label Nombre 
+      input#inputNombre(type="text")
+    div 
+      label Mensaje
+      input#inputMensaje(type="text")
+    button#btnEnviar Enviar
+
+  script.
+    const socket = io();
+    const inputNombre = document.getElementById('inputNombre');
+    const inputMensaje = document.getElementById('inputMensaje');
+    const mensajes = document.getElementById('mensajes');
+    const btnEnviar = document.getElementById('btnEnviar');
+    const numUsuarios = document.getElementById('num_usuarios');
+
+    btnEnviar.addEventListener('click', () => {
+      const mensajeEnviado = {
+        nombre: inputNombre.value,
+        mensaje: inputMensaje.value
+      }
+      socket.emit('mensaje_chat', mensajeEnviado);
+    });
+
+    socket.on('mensaje_chat', ({nombre, mensaje}) => {
+      const li = document.createElement('li');
+      li.innerText = `${nombre}: ${mensaje}`;
+      mensajes.appendChild(li);
+      })
+    socket.on('usuarios_chat', (numUsers) => {
+      numUsuarios.innerText = `${numUsers}`;
+      })
+
+
+
+  //- h1 CHAT
+  //- ul#mensajes
+
+
+  //- form(method='POST' action='/')
+  //-   div
+  //-     label(for='inputNombre') Nombre:
+  //-     input#inputNombre(type='text', name='inputNombre')
+  //-   div
+  //-     label(for='inputMensaje') Mensaje:
+  //-     input#inputMensaje(type='text', name='inputMensaje')
+
+  //-   input#boton(type="submit", name="envio", value="Enviar")
